@@ -629,13 +629,60 @@ class ANWBFullScraper(scrapy.Spider):
                         promo_tags.append('Ledenvoordeel')
                         break
             
-            # Extract image URLs
+            # Extract image URLs with better filtering
             image_urls = []
+            car_brand_in_url = False
+
+            # Use the make (brand) to help filter relevant images
+            make_lower = make.lower()
+
+            # Check all img elements
             for img in response.css('img::attr(src)').getall():
-                if img.startswith('http') and \
-                   ('transform' in img or '.jpg' in img or '.png' in img) and \
-                   not ('icon' in img.lower() or 'logo' in img.lower()):
+                # Must be an absolute URL
+                if not img.startswith('http'):
+                    continue
+                    
+                # Must be an image file or transformation
+                if not ('transform' in img or '.jpg' in img or '.png' in img):
+                    continue
+                    
+                # Exclude common non-car image patterns
+                if any(x in img.lower() for x in ['icon', 'logo', 'banner', 'anwb-fietsverzekeren', 
+                                                'autoverkoopservice', 'wat-je-pech', 'onderweg-app',
+                                                'getty', 'campagnepagina', 'homepage', 'zonnepanelen',
+                                                'energiecontract']):
+                    continue
+                    
+                # Prefer images that contain the car make name or model
+                if make_lower in img.lower() or model.lower().replace('-', '') in img.lower():
+                    car_brand_in_url = True
                     image_urls.append(img)
+                # Or at least match the general pattern of car images
+                elif model.lower().split('-')[0] in img.lower():
+                    car_brand_in_url = True
+                    image_urls.append(img)
+                # For images that don't explicitly mention the brand, be more selective
+                elif 'transform' in img and any(x in img.lower() for x in ['front', 'back', 'side', 'interior', 'dash']):
+                    image_urls.append(img)
+                # Only include other transform images if we haven't found brand-specific ones yet
+                elif 'transform' in img and not car_brand_in_url and not any(x in img.lower() for x in ['anwb-', 'campagne']):
+                    image_urls.append(img)
+
+            # Limit to a reasonable number - car listings typically have 5-10 images
+            if len(image_urls) > 10:
+                # If we have brand-specific images, prioritize those
+                if car_brand_in_url:
+                    brand_images = [img for img in image_urls if make_lower in img.lower() 
+                                    or model.lower().replace('-', '') in img.lower()
+                                    or model.lower().split('-')[0] in img.lower()]
+                    if brand_images:
+                        image_urls = brand_images[:10]  # Keep up to 10 brand-specific images
+                    else:
+                        image_urls = image_urls[:10]  # Just keep the first 10 if no brand-specific ones
+                else:
+                    image_urls = image_urls[:10]  # Just keep the first 10
+
+            self.logger.info(f"Extracted {len(image_urls)} filtered car images")
             
             # Create item
             item = {

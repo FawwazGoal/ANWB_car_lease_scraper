@@ -8,6 +8,14 @@ venv/
 env/
 .env/
 .venv/
+fix_car_lease/
+
+# Scrapy specific
+.scrapy/
+
+# Output and debug directories
+debug/
+output/
 
 # Playwright and browser-related large files
 lib/python3.9/site-packages/playwright/driver/
@@ -45,3 +53,7 @@ Thumbs.db
 # Large binary files
 *.bin
 *.dat
+
+# Selenium/Chrome related
+chromedriver*
+.chrome/

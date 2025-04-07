@@ -10,87 +10,65 @@ This scraper extracts car leasing information from the ANWB Private Lease websit
 - Bonus or discount tags
 - Car image URLs
 
-## Current Implementation
-The current implementation uses a predefined list of 10 car URLs to demonstrate the extraction functionality. This approach was chosen for reliability and simplicity for the assignment.
+## Solution Overview
+The implementation uses Scrapy with Selenium for browser automation to handle dynamic content loading. The scraper performs the following steps:
 
-## Full Solution for Discovery of All 199 Listings
-To extract all 199 car listings, a URL discovery mechanism would need to be implemented. This would involve:
+1. Uses Selenium to navigate to the main listing page and extracts all 199 car listing URLs by:
+   - Automatically clicking the "Load More" button to reveal all listings
+   - Extracting all car detail page URLs using various CSS selectors and JavaScript techniques
+   - Handling edge cases and potential errors during the discovery process
 
-1. Starting at the main listing page: https://www.anwb.nl/auto/private-lease/anwb-private-lease/aanbod/aanbod=new
-2. Using browser automation (Playwright or Selenium) to extract all car links
-3. Following pagination to get all pages of results
-4. Saving and using the complete list of URLs
+2. Scrapes each individual car page to extract detailed information
+   - Extracts pricing, configuration, and promotional information
+   - Validates and transforms the data
+   - Handles various formats and error cases
 
-Below is a pseudocode example of how this discovery process would work:
+3. Saves the results in both JSON and CSV formats with validation
 
-```python
+## Installation
 
-    # For a full solution that discovers all 199 car URLs, this method would be implemented:
-    # 1. Start at the main listing page: https://www.anwb.nl/auto/private-lease/anwb-private-lease/aanbod/aanbod=new
-    # 2. Use browser automation (like Selenium or Playwright) to extract all car links
-    # 3. Follow pagination to get all pages of results
-    # 4. Save the complete list of URLs
-    
-    # A pseudocode example of how this would work:
-    def discover_all_car_urls():
-        from playwright.sync_api import sync_playwright
-        
-        car_urls = []
-        with sync_playwright() as p:
-            browser = p.chromium.launch()
-            page = browser.new_page()
-            
-            # Visit main listing page
-            page.goto("https://www.anwb.nl/auto/private-lease/anwb-private-lease/aanbod/aanbod=new")
-            page.wait_for_load_state("networkidle")
-            
-            # Loop through all pages
-            has_next_page = True
-            while has_next_page:
-                # Extract all car links on current page
-                links = page.query_selector_all('a[href*="/auto/private-lease/anwb-private-lease/aanbod/"]')
-                for link in links:
-                    href = link.get_attribute('href')
-                    if href and '/aanbod/' in href and not href.endswith('aanbod=new'):
-                        full_url = 'https://www.anwb.nl' + href if not href.startswith('http') else href
-                        if full_url not in car_urls:
-                            car_urls.append(full_url)
-                
-                # Check for next page button
-                next_button = page.query_selector('a[aria-label="Volgende pagina"]')
-                if next_button:
-                    next_button.click()
-                    page.wait_for_load_state("networkidle")
-                else:
-                    has_next_page = False
-            
-            browser.close()
-        
-        # Save URLs to file
-        with open('all_car_urls.json', 'w') as f:
-            json.dump(car_urls, f, indent=2)
-        
-        return car_urls
-    ```
-
-## Running the Scraper
-1. Ensure you have the required dependencies installed:
+1. Ensure you have Python 3.8+ installed
+2. Clone this repository
+3. Set up a virtual environment:
+   ```
+   python -m venv venv
+   source venv/bin/activate  # On Windows: venv\Scripts\activate
+   ```
+4. Install dependencies:
    ```
    pip install -r requirements.txt
    ```
+5. Install the Chrome browser if not already installed (required for Selenium)
 
-2. Run the spider:
-   ```
-   scrapy crawl anwb_lease
-   ```
+## Running the Scraper
 
-3. The results will be saved in both JSON and CSV formats in the `output` directory.
+To run the scraper that extracts all car listings:
+```
+scrapy crawl anwb_lease
+```
 
-## File Structure
-- `anwb_lease_scraper/` - Main project directory
+## Output
+The scraped data will be saved in the `output` directory in both JSON and CSV formats.
+
+## Project Structure
+- `fix_car_lease_scraper/` - Main project directory
   - `spiders/` - Contains the spider implementation
-  - `items.py` - Defines the data structure and validation
-  - `pipelines.py` - Handles processing and saving the data
-- `output/` - Contains the extracted data
-- `debug/` - Contains debugging information
-            
+    - `anwb_spider.py` - Main spider that extracts all car listings
+  - `processors/` - Contains data processing utilities
+    - `transformers.py` - Data transformation utilities
+    - `validators.py` - Data validation utilities
+  - `items.py` - Defines data models with validation using Pydantic
+  - `pipelines.py` - Processing pipelines for validation and storage
+  - `settings.py` - Scrapy settings
+- `output/` - Output directory for scraped data
+
+## Notes
+- The scraper handles anti-bot mechanisms by using browser automation with realistic user agent and behavior
+- Error handling and retries are implemented throughout the scraping process
+- Data validation ensures the extracted data meets the expected format and value ranges
+- The solution is designed to be robust against changes in the website structure
+
+## Limitations
+- The scraper requires Chrome browser and ChromeDriver to be installed
+- Performance may vary depending on network conditions and website load
+- The website structure may change, requiring updates to the selectors used in the scraper
