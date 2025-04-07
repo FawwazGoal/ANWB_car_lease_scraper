@@ -47,6 +47,56 @@ To run the scraper that extracts all car listings:
 scrapy crawl anwb_lease
 ```
 
+## Scheduling
+
+The project includes a scheduler component (`scheduler.py`) for implementing automated, regular data collection. This scheduler is a wrapper script for the scraper that adds error handling, logging, and retry capabilities.
+
+### Important Note on the Scheduler
+
+**The `scheduler.py` script itself DOES NOT automatically schedule anything.** It is designed to be called by an external scheduling system like cron (Linux/Mac) or Task Scheduler (Windows).
+
+The scheduler component serves several purposes:
+1. Provides a stable execution environment for the scraper
+2. Implements error handling and automatic retries if the scraper fails
+3. Maintains detailed logs of execution history and results
+4. Creates a standardized interface for external scheduling systems
+
+### Running the scheduler manually:
+```
+python scheduler.py
+```
+This will run the scraper once with retry logic.
+
+### Setting up automated scheduling:
+
+To run the scraper on a regular schedule (e.g., daily), you need to configure an external scheduling system:
+
+#### Using cron (Linux/Mac):
+```
+# Edit crontab
+crontab -e
+
+# Add line to run daily at 2 AM
+0 2 * * * cd /path/to/project && /path/to/venv/bin/python scheduler.py
+```
+
+#### Using Windows Task Scheduler:
+1. Open Task Scheduler
+2. Create a Basic Task
+3. Set the trigger (e.g., Daily at 2 AM)
+4. Set the action to "Start a program"
+5. Program/script: `C:\path\to\venv\Scripts\python.exe`
+6. Arguments: `scheduler.py`
+7. Start in: `C:\path\to\project`
+
+### How the scheduling system works:
+
+1. The external scheduler (cron, Task Scheduler) determines WHEN to run
+2. The `scheduler.py` script determines HOW to run (with retries, logging, etc.)
+3. The scraper (`anwb_lease`) performs the actual data collection
+
+This separation of concerns allows for a robust and maintainable data pipeline.
+
 ## Output
 The scraped data will be saved in the `output` directory in both JSON and CSV formats.
 
@@ -61,6 +111,7 @@ The scraped data will be saved in the `output` directory in both JSON and CSV fo
   - `pipelines.py` - Processing pipelines for validation and storage
   - `settings.py` - Scrapy settings
 - `output/` - Output directory for scraped data
+- `scheduler.py` - Script for scheduling regular scraper runs
 
 ## Notes
 - The scraper handles anti-bot mechanisms by using browser automation with realistic user agent and behavior
