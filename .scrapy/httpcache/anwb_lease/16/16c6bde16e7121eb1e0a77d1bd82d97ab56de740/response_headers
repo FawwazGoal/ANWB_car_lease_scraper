@@ -1,0 +1,12 @@
+Content-Length: 914
+Cache-Status: "Netlify Edge"; hit
+Content-Encoding: gzip
+Content-Type: text/plain
+Netlify-Vary: cookie=__next_preview_data:presence|__prerender_bypass:presence,query
+Strict-Transport-Security: max-age=31536000
+Vary: Accept-Encoding
+X-Nf-Render-Mode: ssr
+X-Nf-Request-Id: 01JR6XPNH49D2QVNBP3M9CQD0C
+Cache-Control: public, max-age=90
+Expires: Mon, 07 Apr 2025 01:29:44 GMT
+Date: Mon, 07 Apr 2025 01:28:14 GMT

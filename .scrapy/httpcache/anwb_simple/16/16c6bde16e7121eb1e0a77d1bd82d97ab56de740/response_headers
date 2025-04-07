@@ -1,0 +1,12 @@
+Content-Length: 914
+Cache-Status: "Netlify Durable"; fwd=bypass, "Netlify Edge"; fwd=stale
+Content-Encoding: gzip
+Content-Type: text/plain
+Netlify-Vary: cookie=__next_preview_data:presence|__prerender_bypass:presence,query
+Strict-Transport-Security: max-age=31536000
+Vary: Accept-Encoding
+X-Nf-Render-Mode: ssr
+X-Nf-Request-Id: 01JR6Y9D4RH5YSSHTPK6PCCHK4
+Cache-Control: public, max-age=165
+Expires: Mon, 07 Apr 2025 01:41:32 GMT
+Date: Mon, 07 Apr 2025 01:38:47 GMT
