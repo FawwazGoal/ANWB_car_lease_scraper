@@ -1,0 +1,47 @@
+# Python specifics
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environments
+venv/
+env/
+.env/
+.venv/
+
+# Playwright and browser-related large files
+lib/python3.9/site-packages/playwright/driver/
+*.whl
+*.egg
+*.egg-info/
+
+# Distribution / packaging
+dist/
+build/
+*.egg
+*.egg-info/
+
+# IDEs and editors
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# Logs
+*.log
+
+# Large binary files
+*.bin
+*.dat
